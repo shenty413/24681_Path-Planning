@@ -9,9 +9,10 @@ function [vAroundvLast] = findPointsAround(vLast,vInFaceIdx,fdata,nState,vAround
 %     1 - 2
 %     [2,3,6] = findPointsAround(1,vInFaceIdx,fdata,nState)
 
-    fAroundvLast = vInFaceIdx(vLast,:);
-    [value,idx] = min(fAroundvLast);
-    for i = 1:idx-1
+%     fAroundvLast = vInFaceIdx(vLast,:);
+    fAroundvLast = vInFaceIdx{vLast};
+%     [value,idx] = min(fAroundvLast);
+    for i = 1:size(fAroundvLast,2)
         vv(i,:) = fdata(fAroundvLast(i),:);
     end
     % find all vertice around given v, including those have been chosen and

@@ -1,15 +1,16 @@
-clear all;
-% close all;
-%this script is written by Disheng Hou, a
-%read obj files
-[v,f]=obj__read("meshdata.obj");
-v=v';
-f=f';
+clear all;close all;
+[x,y] = meshgrid(1:0.5:15,1:0.5:15);
+    tri = delaunay(x,y);
+%     z = ones(15,15);
+    z = peaks(29);
+%     trimesh(tri,x,y,z) % plot the mesh data
+numV = 29*29;
+    v = [reshape(x,29*29,1) reshape(y,29*29,1) reshape(z,29*29,1)];
+    f = tri;
 
-figure();
 
+%extract edges according to faces   
 edges = [];
-%extract edges according to faces
 for i = 1:size(f,1)
     for j=1:size(f(i,:),2)
         if j==size(f(i,:),2)
@@ -48,8 +49,8 @@ uedges1(1,:)=[];
 end
 
 %construct the weight/distance matrix
-startpoint = 530;
-endpoint = 428;
+startpoint = 1;
+endpoint = 488;
 spoints = unique(uedges1(:,1));
 currentpoint = startpoint;
 dist = ones(size(spoints,1),size(spoints,1))*1000000;
@@ -80,14 +81,16 @@ for i = 1:size(spoints,1)
     end
 end
 %output the path according to the start and end points
+
 spath = output(startpoint,endpoint,path);
 spath = [startpoint,spath];
 figure
 hold on
-scatter3(v(:,3),v(:,2),v(:,1));
-plot3(v(spath,1),v(spath,2),v(spath,3));
-hold off
-figure
-hold on
-plot3(v(spath,1),v(spath,2),v(spath,3));
+for i = 1:size(f,1)
+    v1=v(f(i,1),:);v2=v(f(i,2),:);v3=v(f(i,3),:);
+    plot3([v1(1) v2(1) v3(1) v1(1)],[v1(2) v2(2) v3(2) v1(2)],[v1(3) v2(3) v3(3) v1(3)],'k-');
+end
+plot3(v(spath,1),v(spath,2),v(spath,3),'r');
+scatter3(v(startpoint,1),v(startpoint,2),v(startpoint,3),'b');
+scatter3(v(endpoint,1),v(endpoint,2),v(endpoint,3),'g');
 hold off

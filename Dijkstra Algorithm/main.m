@@ -1,25 +1,50 @@
 %%%%
+clear all;
+close all;
 % This program uses Dijkstra algorithm to find the shortest path on a 3D
 % meshgrid for random start and end point.
 % 
 % change the step of callMeshData to use different data
 
-
+% [x,y] = meshgrid(1:0.5:15,1:0.5:15);
+%     tri = delaunay(x,y);
+% %     z = ones(15,15);
+%     z = peaks(29);
+% %     trimesh(tri,x,y,z) % plot the mesh data
+% numV = 29*29;
+%     v = [reshape(x,29*29,1) reshape(y,29*29,1) reshape(z,29*29,1)];
+%     f = tri;
+% 
+[v,f]=obj__read("meshdata.obj");%read .obj files
+v=v';
+f=f';
 %% Get the mesh data
-clear;%clc;%close all;
 % [vdata,fdata,numV] = getDataFromFile('triceratops.dat',true);
 
 % get the mesh data, input the step of mesh
-[vdata,fdata,numV] = callMeshData(0.3);
-
+vdata =v;
+fdata=f;
+numV = size(v,1);
 %% find a certain vertice in all faces
 
-vInFaceIdx = -1*ones(numV);
+% vInFaceIdx = -1*ones(numV);
+% nIdxInFace = zeros(numV,1);
+% for i = 1:size(fdata,1)
+%     for j = 1:3
+%         vInFaceIdx(fdata(i,j),nIdxInFace(fdata(i,j))+1) = i;
+%         nIdxInFace(fdata(i,j)) = nIdxInFace(fdata(i,j))+1;
+%     end
+% end
+
+vInFaceIdx = cell(numV,1);
 nIdxInFace = zeros(numV,1);
 for i = 1:size(fdata,1)
-    for j = 1:3
-        vInFaceIdx(fdata(i,j),nIdxInFace(fdata(i,j))+1) = i;
+    for j = 1:size(fdata(i,:),2)
+%         vIdx = vInFaceIdx{fdata(i,j)};
+        vInFaceIdx{fdata(i,j)}(nIdxInFace(fdata(i,j))+1) = i;
         nIdxInFace(fdata(i,j)) = nIdxInFace(fdata(i,j))+1;
+%         vInFaceIdx(fdata(i,j),nIdxInFace(fdata(i,j))+1) = i;
+%         nIdxInFace(fdata(i,j)) = nIdxInFace(fdata(i,j))+1;
     end
 end
 
@@ -30,8 +55,8 @@ for i = 1:size(fdata,1)
 end
 
 %% initialize start and end point
-vStart = 875; % 29
-vEnd = 900;  % 488 588
+vStart = 530; % 15
+vEnd = 428;  % 117 100 33  % error: 123 200
 
 % vStart = floor(mod(rand*1000000,numV))
 % vEnd = floor(mod(rand*1000000,numV))

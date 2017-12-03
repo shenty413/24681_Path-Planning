@@ -1,4 +1,4 @@
-clear all;%close all;
+clear all;close all;
 % [x,y] = meshgrid(1:0.5:15,1:0.5:15);
 %     tri = delaunay(x,y);
 % %     z = ones(15,15);
@@ -7,8 +7,12 @@ clear all;%close all;
 % numV = 29*29;
 %     v = [reshape(x,29*29,1) reshape(y,29*29,1) reshape(z,29*29,1)];
 %     f = tri;
-[v,f,numV] = callMeshData(0.3);
-
+% 
+[v,f]=obj__read("meshdata.obj");%read .obj files
+v=v';
+f=f';
+distt=[];
+scatter3(v(:,3),v(:,2),v(:,1));
 %extract edges according to faces   
 edges = [];
 for i = 1:size(f,1)
@@ -18,17 +22,6 @@ for i = 1:size(f,1)
         else
             edges = [edges;[f(i,j),f(i,j+1)]];
         end
-    end
-end
-for i = 1:size(f,1)
-    j=size(f(i,:),2);
-    while(j>=1)
-        if j==1
-            edges = [edges;[f(i,1),f(i,size(f(i,:),2))]];
-        else
-            edges = [edges;[f(i,j),f(i,j-1)]];
-        end
-        j=j-1;
     end
 end
 %delete the repeated edges
@@ -49,11 +42,11 @@ uedges1(1,:)=[];
 end
 
 %construct the weight/distance matrix
-startpoint = 29;
-endpoint = 900;
+startpoint =530;
+endpoint = 428;
 spoints = unique(uedges1(:,1));
 currentpoint = startpoint;
-dist = ones(size(spoints,1),size(spoints,1))*1000000;
+dist = ones(size(spoints,1),size(spoints,1))*inf;
 path =zeros(size(spoints,1),size(spoints,1));
 for i =1:size(spoints,1)
     index = find(uedges1(:,1)==i);
@@ -69,10 +62,10 @@ for i =1:size(spoints,1)
 end
 %floyd-warshall process get the full path matrix
 fulldist = dist;
-for i = 1:size(spoints,1)
-    for j =1:size(spoints,1)
-        for k =1:size(spoints,1)
-            if((fulldist(i,j)>(fulldist(i,k)+fulldist(k,j)))&&fulldist(i,k)<1000000&&fulldist(i,k)<1000000)
+for k = 1:size(spoints,1)
+    for i =1:size(spoints,1)
+        for j =1:size(spoints,1)
+            if((fulldist(i,j)>(fulldist(i,k)+fulldist(k,j)))&&fulldist(i,k)<inf&&fulldist(i,k)<inf)
                      fulldist(i,j)=fulldist(i,k)+fulldist(k,j);
                      path(i,j)= k;
                      
@@ -84,6 +77,7 @@ end
 
 spath = output(startpoint,endpoint,path);
 spath = [startpoint,spath];
+%  spath =[2;112;135;136;134;152;158;157;184;162;185;232;233;50]';
 figure
 hold on
 for i = 1:size(f,1)
@@ -94,11 +88,15 @@ plot3(v(spath,1),v(spath,2),v(spath,3),'r');
 scatter3(v(startpoint,1),v(startpoint,2),v(startpoint,3),'b');
 scatter3(v(endpoint,1),v(endpoint,2),v(endpoint,3),'g');
 hold off
+% %belman-ford process get the full path matrix
 
+%% test length
 routeLength = 0;
 for i = 1:size(spath,2)-1
     ddd = pdist([v(spath(i),1),v(spath(i),2),v(spath(i),3);...
         v(spath(i+1),1),v(spath(i+1),2),v(spath(i+1),3)]);
     routeLength = routeLength+ddd;
 end
+
+disp('Warshall algorithm:')
 routeLength
